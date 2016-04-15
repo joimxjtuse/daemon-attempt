@@ -13,9 +13,13 @@ public class MainActivity extends ActionBarActivity {
 
     /**
      * 1. compile hello.c;
-     * <p/>
-     * <p/>
-     * <p/>
+     *    these articles may be help:
+     *        http://www.cnblogs.com/candycaicai/p/3282214.html;
+     *        http://corochann.com/build-executable-file-with-android-ndk-after-lollipop-android-api-21-388.html;
+     * 2. Maybe, in order to run "hello", i should copy it into data/data/pack.. dir,
+     *   TODO
+     *    http://blog.csdn.net/wangzhiyu1980/article/details/16972937
+     *    http://cubie.cc/forum.php?mod=viewthread&tid=758
      * 2
      */
     @Override
