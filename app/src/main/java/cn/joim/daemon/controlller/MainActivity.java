@@ -1,5 +1,6 @@
 package cn.joim.daemon.controlller;
 
+import android.content.res.AssetManager;
 import android.os.Build;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -7,19 +8,27 @@ import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 
 public class MainActivity extends ActionBarActivity {
 
+
     /**
      * 1. compile hello.c;
-     *    these articles may be help:
-     *        http://www.cnblogs.com/candycaicai/p/3282214.html;
-     *        http://corochann.com/build-executable-file-with-android-ndk-after-lollipop-android-api-21-388.html;
+     * these articles may be help:
+     * http://www.cnblogs.com/candycaicai/p/3282214.html;
+     * http://corochann.com/build-executable-file-with-android-ndk-after-lollipop-android-api-21-388.html;
      * 2. Maybe, in order to run "hello", i should copy it into data/data/pack.. dir,
-     *   TODO
-     *    http://blog.csdn.net/wangzhiyu1980/article/details/16972937
-     *    http://cubie.cc/forum.php?mod=viewthread&tid=758
+     * TODO
+     * http://blog.csdn.net/wangzhiyu1980/article/details/16972937
+     * http://cubie.cc/forum.php?mod=viewthread&tid=758
      * 2
      */
     @Override
@@ -48,7 +57,83 @@ public class MainActivity extends ActionBarActivity {
             index = 2;
         }
 
+        Button btn = (Button) findViewById(R.id.btn_check_hello);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!isDaemonExists()) {
+                    saveDaemonResource();
+                }
+                setDaemonResourcePermission();
+                CMDExecute mExecutor = new CMDExecute();
 
+                String m_strResult = "";
+                String DAEMON_FILE_PATH = getFilesDir()
+                        .getAbsolutePath();
+
+                String DAEMON_FILE_NAME = "hello";
+                String arg[] = {DAEMON_FILE_PATH + "/" + DAEMON_FILE_NAME};
+                try {
+                    m_strResult = mExecutor.run(arg, DAEMON_FILE_PATH);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+    }
+
+
+    private void saveDaemonResource() {
+
+        AssetManager aManage = getAssets();
+        String path = getFilesDir()
+                .getAbsolutePath();   //data/data目录
+        File file = new File(path + "/" + "hello");
+        try {
+            InputStream in = aManage.open("armeabi/hello");  //从assets目录下复制
+            FileOutputStream out = new FileOutputStream(file);
+            int length = -1;
+            byte[] buf = new byte[1024];
+            while ((length = in.read(buf)) != -1) {
+                out.write(buf, 0, length);
+            }
+            out.flush();
+            in.close();
+            out.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Log.i("joim", "copy success");
+    }
+
+    private void setDaemonResourcePermission() {
+        String DAEMON_FILE_PATH = this.getFilesDir()
+                .getAbsolutePath() + "/";
+
+        String DAEMON_FILE_NAME = "hello";
+        String cmdLine = "chmod 711 " + DAEMON_FILE_PATH + DAEMON_FILE_NAME;
+        try {
+            Runtime.getRuntime().exec(cmdLine);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    private boolean isDaemonExists() {
+        try {
+            String DAEMON_FILE_PATH = this.getFilesDir()
+                    .getAbsolutePath() + "/";
+
+            String DAEMON_FILE_NAME = "hello";
+            File file = new File(DAEMON_FILE_PATH + DAEMON_FILE_NAME);
+            return file.exists();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override
