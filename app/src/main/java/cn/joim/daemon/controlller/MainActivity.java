@@ -19,6 +19,8 @@ import java.io.InputStream;
 
 public class MainActivity extends ActionBarActivity {
 
+    private static final String FILE_NAME = "daemon";
+
 
     /**
      * 1. compile hello.c;
@@ -71,7 +73,7 @@ public class MainActivity extends ActionBarActivity {
                 String DAEMON_FILE_PATH = getFilesDir()
                         .getAbsolutePath();
 
-                String DAEMON_FILE_NAME = "hello";
+                String DAEMON_FILE_NAME = FILE_NAME;
                 String arg[] = {DAEMON_FILE_PATH + "/" + DAEMON_FILE_NAME};
                 try {
                     m_strResult = mExecutor.run(arg, DAEMON_FILE_PATH);
@@ -90,9 +92,9 @@ public class MainActivity extends ActionBarActivity {
         AssetManager aManage = getAssets();
         String path = getFilesDir()
                 .getAbsolutePath();   //data/data目录
-        File file = new File(path + "/" + "hello");
+        File file = new File(path + "/" + FILE_NAME);
         try {
-            InputStream in = aManage.open("armeabi/hello");  //从assets目录下复制
+            InputStream in = aManage.open("armeabi/" + FILE_NAME);  //从assets目录下复制
             FileOutputStream out = new FileOutputStream(file);
             int length = -1;
             byte[] buf = new byte[1024];
@@ -112,7 +114,7 @@ public class MainActivity extends ActionBarActivity {
         String DAEMON_FILE_PATH = this.getFilesDir()
                 .getAbsolutePath() + "/";
 
-        String DAEMON_FILE_NAME = "hello";
+        String DAEMON_FILE_NAME = FILE_NAME;
         String cmdLine = "chmod 711 " + DAEMON_FILE_PATH + DAEMON_FILE_NAME;
         try {
             Runtime.getRuntime().exec(cmdLine);
@@ -128,7 +130,7 @@ public class MainActivity extends ActionBarActivity {
             String DAEMON_FILE_PATH = this.getFilesDir()
                     .getAbsolutePath() + "/";
 
-            String DAEMON_FILE_NAME = "hello";
+            String DAEMON_FILE_NAME = FILE_NAME;
             File file = new File(DAEMON_FILE_PATH + DAEMON_FILE_NAME);
             return file.exists();
         } catch (Exception e) {

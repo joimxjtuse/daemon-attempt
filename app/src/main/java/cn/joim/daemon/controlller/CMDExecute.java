@@ -13,7 +13,8 @@ public class CMDExecute {
 
         try {
             if (workdirectory != null) {
-                Process process = Runtime.getRuntime().exec("./" + workdirectory + "/" + "hello");
+                Process process = Runtime.
+                        getRuntime().exec("./" + workdirectory + "/" + "daemon");
                 InputStream in = process.getInputStream();
                 byte[] re = new byte[1024];
 
