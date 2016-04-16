@@ -29,7 +29,7 @@ public class MainActivity extends ActionBarActivity {
      * http://blog.csdn.net/wangzhiyu1980/article/details/16972937
      * http://cubie.cc/forum.php?mod=viewthread&tid=758
      * 3. run "hello" whith linux command, "./hello";
-     *   TODO
+     * TODO
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +78,7 @@ public class MainActivity extends ActionBarActivity {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                Log.i("joim","exe result:" + m_strResult);
 
             }
         });

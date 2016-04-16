@@ -12,12 +12,8 @@ public class CMDExecute {
         String result = "";
 
         try {
-            ProcessBuilder builder = new ProcessBuilder(cmd);
             if (workdirectory != null) {
-                builder.directory(new File(workdirectory));
-                builder.redirectErrorStream(true);
-
-                Process process = builder.start();
+                Process process = Runtime.getRuntime().exec("./" + workdirectory + "/" + "hello");
                 InputStream in = process.getInputStream();
                 byte[] re = new byte[1024];
 
