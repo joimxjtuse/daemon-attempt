@@ -10,23 +10,28 @@ public class CMDExecute {
 
     public synchronized String run(String[] cmd, String workdirectory) throws Exception {
         String result = "";
+        boolean runSuccess = false;
 
         try {
             if (workdirectory != null) {
-                Process process = Runtime.
-                        getRuntime().exec("./" + workdirectory + "/" + "daemon");
-                InputStream in = process.getInputStream();
-                byte[] re = new byte[1024];
-
-                while (in.read(re) != -1) {
-                    System.out.println(new String(re));
-                    result = result + new String(re);
-                }
-                in.close();
+                Runtime.
+                        getRuntime().exec( workdirectory + "/" + "daemon" +
+                        "  -p cn.joim.daemon.controlller -s com.ifeng.ipush.client.service.PushService -t 120").waitFor();
+//                Process process = Runtime.
+//                        getRuntime().exec("./" + workdirectory + "/" + "daemon" +
+//                        "  -p com.coolerfall.daemon.sample -s com.coolerfall.service.DaemonService -t 120");
+//                InputStream in = process.getInputStream();
+//                byte[] re = new byte[1024];
+//
+//                while (in.read(re) != -1) {
+//                    result = result + new String(re);
+//                }
+//                in.close();
+                runSuccess = true;
             }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        return result;
+        return String.valueOf(runSuccess);
     }
 }

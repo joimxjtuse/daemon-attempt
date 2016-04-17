@@ -17,6 +17,17 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    sourceSets {
+        main {
+            jni.srcDirs = []
+        }
+    }
+}
+
+task copyExeFile(type: Copy) {
+    from fileTree(dir: file(buildDir.absolutePath + '/ndk/libs'), include: '**/*')
+    into file('src/main/assets/')
 }
 
 dependencies {

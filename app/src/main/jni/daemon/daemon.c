@@ -22,7 +22,7 @@
 
 #include "common.h"
 
-#define LOG_TAG         "Daemon"
+#define LOG_TAG         "JoimDaemon"
 #define	MAXFILE         3
 #define SLEEP_INTERVAL  2 * 60
 
@@ -79,113 +79,43 @@ static void start_service(char *package_name, char *service_name)
 	}
 }
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]){
+
+	LOGD(LOG_TAG, "1. call main method.");
+	printf("1. call main method.");
 	int i;
-	pid_t pid;
-	char *package_name = NULL;
-	char *service_name = NULL;
-	char *daemon_file_dir = NULL;
-	int interval = SLEEP_INTERVAL;
-
-	printf("Copyright (c) 2015-2016, Vincent Cheung<coolingfall@gmail.com>");
-	LOGI(LOG_TAG, "Copyright (c) 2015-2016, Vincent Cheung<coolingfall@gmail.com>");
-
-	if (argc < 7)
-	{
-		LOGE(LOG_TAG, "usage: %s -p package-name -s "
-		 "daemon-service-name -t interval-time", argv[0]);
-		return;
-	}
-
-	for (i = 0; i < argc; i ++)
-	{
-		if (!strcmp("-p", argv[i]))
-		{
+    pid_t pid;
+    char *package_name = NULL;
+    char *service_name = NULL;
+    char *daemon_file_dir = NULL;
+    int interval = SLEEP_INTERVAL;
+    //if (argc < 7){
+    //	LOGE(LOG_TAG, "usage: %s -p package-name -s daemon-service-name -t interval-time", argv[0]);
+    //		return;
+    //}
+    for (i = 0; i < argc; i ++){
+        if (!strcmp("-p", argv[i])){
 			package_name = argv[i + 1];
 			LOGD(LOG_TAG, "package name: %s", package_name);
+			printf("2. package name: %s", package_name);
 		}
 
-		if (!strcmp("-s", argv[i]))
-		{
-			service_name = argv[i + 1];
-			LOGD(LOG_TAG, "service name: %s", service_name);
-		}
+		if (!strcmp("-s", argv[i])){
+        	service_name = argv[i + 1];
+        	printf("3. service name: %s", service_name);
+        	LOGD(LOG_TAG, "service name: %s", service_name);
+        }
 
-		if (!strcmp("-t", argv[i]))
-		{
-			interval = atoi(argv[i + 1]);
-			LOGD(LOG_TAG, "interval: %d", interval);
-		}
-	}
+        if (!strcmp("-t", argv[i])){
+        	interval = atoi(argv[i + 1]);
+        		printf("4. interval: %d", interval);
+        	LOGD(LOG_TAG, "interval: %d", interval);
+        }
+    }
 
-	/* package name and service name should not be null */
-	if (package_name == NULL || service_name == NULL)
-	{
-		LOGE(LOG_TAG, "package name or service name is null");
-		return;
-	}
-
-	if ((pid = fork()) < 0)
-	{
-		exit(EXIT_SUCCESS);
-	}
-	else if (pid == 0)
-	{
-		/* add signal */
-		signal(SIGTERM, sigterm_handler);
-
-		/* become session leader */
-		setsid();
-		/* change work directory */
-		chdir("/");
-
-		for (i = 0; i < MAXFILE; i ++)
-		{
-			close(i);
-		}
-
-		/* find pid by name and kill them */
-		int pid_list[100];
-		int total_num = find_pid_by_name(argv[0], pid_list);
-		LOGD(LOG_TAG, "total num %d", total_num);
-		for (i = 0; i < total_num; i ++)
-		{
-			int retval = 0;
-			int daemon_pid = pid_list[i];
-			if (daemon_pid > 1 && daemon_pid != getpid())
-			{
-				retval = kill(daemon_pid, SIGTERM);
-				if (!retval)
-				{
-					LOGD(LOG_TAG, "kill daemon process success: %d", daemon_pid);
-				}
-				else
-				{
-					LOGD(LOG_TAG, "kill daemon process %d fail: %s", daemon_pid, strerror(errno));
-					exit(EXIT_SUCCESS);
-				}
-			}
-		}
-
-		LOGD(LOG_TAG, "child process fork ok, daemon start: %d", getpid());
-
-		while(sig_running)
-		{
-			interval = interval < SLEEP_INTERVAL ? SLEEP_INTERVAL : interval;
-			select_sleep(interval, 0);
-
-			LOGD(LOG_TAG, "check the service once, interval: %d", interval);
-
-			/* start service */
-			start_service(package_name, service_name);
-		}
-
-		exit(EXIT_SUCCESS);
-	}
-	else
-	{
-		/* parent process */
-		exit(EXIT_SUCCESS);
-	}
+    /* package name and service name should not be null */
+    if (package_name == NULL || service_name == NULL){
+    	LOGE(LOG_TAG, "package name or service name is null");
+    	return;
+    }
 }

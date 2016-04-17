@@ -32,6 +32,13 @@ public class MainActivity extends ActionBarActivity {
      * http://cubie.cc/forum.php?mod=viewthread&tid=758
      * 3. run "hello" whith linux command, "./hello";
      * TODO
+     *
+     *
+     *    1.用户启动ifeng-news-app 后，运行 DaemonService；
+          2.DaemonService使用exec()运行daemon.c代码;
+          3.daemon.c里面做两件事情：
+             1)fork一个子进程；
+                父进程什么也不做，子进程负责重启push-service.
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +70,15 @@ public class MainActivity extends ActionBarActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                runDaemonThread();
+            }
+        });
+    }
+
+    private void runDaemonThread() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
                 if (!isDaemonExists()) {
                     saveDaemonResource();
                 }
@@ -80,10 +96,9 @@ public class MainActivity extends ActionBarActivity {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                Log.i("joim","exe result:" + m_strResult);
-
+                Log.i("joim", "exe result:" + m_strResult);
             }
-        });
+        }, "daemon-java").start();
     }
 
 
@@ -115,7 +130,8 @@ public class MainActivity extends ActionBarActivity {
                 .getAbsolutePath() + "/";
 
         String DAEMON_FILE_NAME = FILE_NAME;
-        String cmdLine = "chmod 711 " + DAEMON_FILE_PATH + DAEMON_FILE_NAME;
+        //711
+        String cmdLine = "chmod 0755 " + DAEMON_FILE_PATH + DAEMON_FILE_NAME;
         try {
             Runtime.getRuntime().exec(cmdLine);
         } catch (Exception e) {
