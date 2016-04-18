@@ -1,25 +1,18 @@
 package cn.joim.daemon.controlller;
 
-import android.content.res.AssetManager;
+import android.content.Intent;
 import android.os.Build;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.text.format.DateFormat;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import cn.joim.daemon.service.DaemonService;
 
 
 public class MainActivity extends ActionBarActivity {
-
-    private static final String FILE_NAME = "daemon";
 
 
     /**
@@ -32,13 +25,13 @@ public class MainActivity extends ActionBarActivity {
      * http://cubie.cc/forum.php?mod=viewthread&tid=758
      * 3. run "hello" whith linux command, "./hello";
      * TODO
-     *
-     *
-     *    1.用户启动ifeng-news-app 后，运行 DaemonService；
-          2.DaemonService使用exec()运行daemon.c代码;
-          3.daemon.c里面做两件事情：
-             1)fork一个子进程；
-                父进程什么也不做，子进程负责重启push-service.
+     * <p/>
+     * <p/>
+     * 1.用户启动ifeng-news-app 后，运行 DaemonService；
+     * 2.DaemonService使用exec()运行daemon.c代码;
+     * 3.daemon.c里面做两件事情：
+     * 1)fork一个子进程；
+     * 父进程什么也不做，子进程负责重启push-service.
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,93 +60,17 @@ public class MainActivity extends ActionBarActivity {
         }
 
         Button btn = (Button) findViewById(R.id.btn_check_hello);
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                runDaemonThread();
-            }
-        });
-    }
+//        btn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//            }
+//        });
 
-    private void runDaemonThread() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (!isDaemonExists()) {
-                    saveDaemonResource();
-                }
-                setDaemonResourcePermission();
-                CMDExecute mExecutor = new CMDExecute();
-
-                String m_strResult = "";
-                String DAEMON_FILE_PATH = getFilesDir()
-                        .getAbsolutePath();
-
-                String DAEMON_FILE_NAME = FILE_NAME;
-                String arg[] = {DAEMON_FILE_PATH + "/" + DAEMON_FILE_NAME};
-                try {
-                    m_strResult = mExecutor.run(arg, DAEMON_FILE_PATH);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                Log.i("joim", "exe result:" + m_strResult);
-            }
-        }, "daemon-java").start();
+        startService(new Intent(this, DaemonService.class));
     }
 
 
-    private void saveDaemonResource() {
-
-        AssetManager aManage = getAssets();
-        String path = getFilesDir()
-                .getAbsolutePath();   //data/data目录
-        File file = new File(path + "/" + FILE_NAME);
-        try {
-            InputStream in = aManage.open("armeabi/" + FILE_NAME);  //从assets目录下复制
-            FileOutputStream out = new FileOutputStream(file);
-            int length = -1;
-            byte[] buf = new byte[1024];
-            while ((length = in.read(buf)) != -1) {
-                out.write(buf, 0, length);
-            }
-            out.flush();
-            in.close();
-            out.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        Log.i("joim", "copy success");
-    }
-
-    private void setDaemonResourcePermission() {
-        String DAEMON_FILE_PATH = this.getFilesDir()
-                .getAbsolutePath() + "/";
-
-        String DAEMON_FILE_NAME = FILE_NAME;
-        //711
-        String cmdLine = "chmod 0755 " + DAEMON_FILE_PATH + DAEMON_FILE_NAME;
-        try {
-            Runtime.getRuntime().exec(cmdLine);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
-
-    private boolean isDaemonExists() {
-        try {
-            String DAEMON_FILE_PATH = this.getFilesDir()
-                    .getAbsolutePath() + "/";
-
-            String DAEMON_FILE_NAME = FILE_NAME;
-            File file = new File(DAEMON_FILE_PATH + DAEMON_FILE_NAME);
-            return file.exists();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
+   
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -1,22 +1,21 @@
 package cn.joim.daemon.controlller;
 
-import java.io.File;
-import java.io.InputStream;
+import android.content.Context;
 
 /**
  * Created by Joim-PC on 2016/4/16.
  */
 public class CMDExecute {
 
-    public synchronized String run(String[] cmd, String workdirectory) throws Exception {
+    public synchronized String run(Context context, Class<?> daemonClazzName, String[] cmd, String workdirectory) throws Exception {
         String result = "";
         boolean runSuccess = false;
 
         try {
             if (workdirectory != null) {
                 Runtime.
-                        getRuntime().exec( workdirectory + "/" + "daemon" +
-                        "  -p cn.joim.daemon.controlller -s com.ifeng.ipush.client.service.PushService -t 120").waitFor();
+                        getRuntime().exec(workdirectory + "/" + "daemon" +
+                        "  -p "+context.getPackageName()+" -s " + daemonClazzName.getName() + " -t 20").waitFor();
 //                Process process = Runtime.
 //                        getRuntime().exec("./" + workdirectory + "/" + "daemon" +
 //                        "  -p com.coolerfall.daemon.sample -s com.coolerfall.service.DaemonService -t 120");
